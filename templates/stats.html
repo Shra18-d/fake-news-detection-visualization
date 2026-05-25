@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Detection - Statistics & Visualizations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: #333;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px cyan;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            color: white;
+            box-shadow: 0 8px 15px rgba(0, 114, 255, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 114, 255, 0.8);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0 8px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .plots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .plot-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            transition: 0.3s ease;
+        }
+
+        .plot-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+        }
+
+        .plot-card h2 {
+            margin-bottom: 15px;
+            color: #141e30;
+            font-size: 1.3em;
+            border-bottom: 3px solid #00c6ff;
+            padding-bottom: 10px;
+        }
+
+        .plot-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            background: #f5f5f5;
+        }
+
+        .stats-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-summary h2 {
+            color: #141e30;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 1.05em;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: bold;
+            color: #243b55;
+        }
+
+        .stat-value {
+            color: #00c6ff;
+            font-weight: bold;
+        }
+
+        .accuracy-badge {
+            background: linear-gradient(45deg, #51cf66, #37b24d);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .plots-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 Fake News Detection - Statistics</h1>
+            <p>Data visualization and model performance analysis</p>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+            <a href="/" class="btn btn-secondary">← Back to Detector</a>
+            <a href="/stats" class="btn btn-primary">Refresh Stats</a>
+        </div>
+
+        <!-- Model Accuracy Summary -->
+        {% if accuracy %}
+        <div class="stats-summary">
+            <h2>📈 Model Performance</h2>
+            <div class="stat-item">
+                <span class="stat-label">Model Accuracy:</span>
+                <span class="stat-value">{{ accuracy }}%</span>
+            </div>
+            <div class="accuracy-badge">
+                ✓ Model is {{ accuracy }}% accurate in detecting fake news
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Visualizations Grid -->
+        <div class="plots-grid">
+
+            <!-- Plot 1: Fake vs True Count -->
+            <div class="plot-card">
+                <h2>📊 Fake vs True News</h2>
+                <img src="/static/fake_vs_true.png" alt="Fake vs True News Count" class="plot-image">
+                <p style="margin-top: 15px; color: #666; font-size: 0.95em;">
+                    Bar chart showing the distribution of fake and true news articles in the dataset.
+                </p>
+            </div>
+
+            <!-- Plot 2: Text Length Distribution -->
+            <div class="plot-card">
+                <h2>📏 Title Length Distribution</h2>
+                <img src="/static/text_length_distribution.png" alt="Text Length Distribution" class="plot-image">
+                <p style="margin-top: 15px; color: #666; font-size: 0.95em;">
+                    Histogram showing how news title lengths are distributed between fake and true news.
+                </p>
+            </div>
+
+            <!-- Plot 3: Model Accuracy -->
+            <div class="plot-card">
+                <h2>🎯 Model Accuracy Breakdown</h2>
+                <img src="/static/model_accuracy.png" alt="Model Accuracy" class="plot-image">
+                <p style="margin-top: 15px; color: #666; font-size: 0.95em;">
+                    Pie chart visualizing the model's accuracy and error rate on test data.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>💡 These visualizations help understand the data patterns and model performance.</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
